@@ -33,9 +33,33 @@ Keep in mind that AWS Lambda is a computing service that runs code in response t
 ## How functions are executed
 When we send a request to execute a Lambda function, AWSLambda creates an environment to run that function. It starts a container for the specific environment and loads the function code into the environment. Then it sends an event to our function. The same process is repeated for all the other requests coming in.
 
+There are 3 invocation types:
+* Request/response
+* Asynchronous invocation
+* Using AWS CLI
+* aws lambda invoke --function-name myfirstlambda out --log-type Tail
+
 ## Check how much you could save going serverless: http://servers.lol/
 
+## API GATEWAYS
+When implementing REST API with AWS Lambda our functions receive HTTP requests in the form of events. Each event contains information like HTTP method, HTTP body, headers, etc.A Lambda function should process this event and return a response that will be converted by AWS into an HTTP response.
 
+### What is API Gateway
+    * Entry point for API users
+    * Pass requests to other services
+    * Process incoming requests
+    * REST API
+    * Websocket APIs
+    * Authentication
+    * Throttling & WAF
+
+### API Gateway targets
+Possible targets for an HTTP request processed by API Gateway:
+    * Lambda Function - call a Lambda function
+    * HTTP Endpoint - call a public HTTP endpoint
+    * AWS Service - send a request to an AWS service
+    * Mock - return a response without calling a backend
+    * VPC Link - access resource in an Amazon Virtual Private Cloud (VPC)
 
 # Serverless TODO
 
