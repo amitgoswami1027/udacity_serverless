@@ -24,11 +24,11 @@
 Keep in mind that AWS Lambda is a computing service that runs code in response to events from Amazon Web Services, while a Lambda function is a single function connected to an event source running in AWS Lambda.
 
 ## AWS Lambda limitations
-   * At most 3GB of memory per execution
-   * Functions can run no more that 15 minutes
-   * Can only write files to /tmp folder
-   * Limited number of concurrent executions
-   * Event size up to 6 MB
+   *  At most 3GB of memory per execution
+   *  Functions can run no more that 15 minutes
+   *  Can only write files to /tmp folder
+   *  Limited number of concurrent executions
+   *  Event size up to 6 MB
 
 ## How functions are executed
 When we send a request to execute a Lambda function, AWSLambda creates an environment to run that function. It starts a container for the specific environment and loads the function code into the environment. Then it sends an event to our function. The same process is repeated for all the other requests coming in.
@@ -61,19 +61,21 @@ Possible targets for an HTTP request processed by API Gateway:
     * Mock - return a response without calling a backend
     * VPC Link - access resource in an Amazon Virtual Private Cloud (VPC)
 
-![](images/api_gateway_concept.png)
+![](images/api_getway_concept.png)
 
 ### Lambda integration modes
 Proxy - passes all request information to a Lambda function. Easier to use.
 Non-proxy - allows to transform incoming request using Velocity Template Language
 
-![](images/lambda.png)
+![](images/lambda_integration.png)
 
+## CORS ( Single-Origin request policy)
+Single-Origin request policy is enabled in all browsers by default and is an important security measure. To send requests from a web application to a different domain (e.g. from localhost to API Gateway domain) we need to configure Cross-Origin request policy in our API.
 
+Alternatively, we need to configure our application so that JavaScript would be served from the same domain that is used for our REST API, but this goes beyond the scope of this cours
 
-
-
-
+![](images/cors1.png)
+![](images/cors2.png)
 # Serverless TODO
 
 To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
