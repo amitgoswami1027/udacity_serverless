@@ -61,6 +61,19 @@ Possible targets for an HTTP request processed by API Gateway:
     * Mock - return a response without calling a backend
     * VPC Link - access resource in an Amazon Virtual Private Cloud (VPC)
 
+![](images/api_gateway_concept.png)
+
+### Lambda integration modes
+Proxy - passes all request information to a Lambda function. Easier to use.
+Non-proxy - allows to transform incoming request using Velocity Template Language
+
+![](images/lambda.png)
+
+
+
+
+
+
 # Serverless TODO
 
 To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
