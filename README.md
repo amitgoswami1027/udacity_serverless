@@ -76,6 +76,34 @@ Alternatively, we need to configure our application so that JavaScript would be 
 
 ![](images/cors1.png)
 ![](images/cors2.png)
+
+# Serverless Framework
+![](images/serverless1.png)
+
+## Using Serverless framework
+* INSTALL : npm install -g serverless
+* CREATE PROJECT : serverless create --template aws-nodejs-typescript --path folder-name
+* INSTALL PLUGIN : npm install plugin-name --save-dev
+* DEPLOY PROJECT : sls deploy -v
+
+### STEPS FOR FIRST SERVERLESS FRAMEWORK DEMO
+1. npm install -g serverless
+2. Set up a new user in IAM named "serverless" and save the access key and sec
+3. Configure serverless to use the AWS credentials you just set up
+   * sls config credentials --provider aws --key YOUR_ACCESS_KEY --secret YOUR_SECRET_KEY --profile serverless
+4. To create a serverless boilerplate project:
+   * sls create --template aws-nodejs-typescript --path 10-udagram-app
+5. To Deploy applicaion:
+   * Install the dependencies: npm install
+   * Deploy the application: sls deploy -v
+6. NOTE: if you get a permissions error when you run deploy you may need to specify the user profile
+   * sls deploy -v --aws-profile serverless
+   
+
+
+
+
+
 # Serverless TODO
 
 To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
