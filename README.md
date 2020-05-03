@@ -189,7 +189,7 @@ Here is an example of a custom authorizer:
 ### OAUTH2.0 PROTOCOL
 ![](images/oauth.png)
 ![](images/oauth_flow.png)
-![](images/oauthO_flow.png)
+![](images/oauth0_flow.png)
 
 
 OAuth allows to use one of the two algorithms that it can use to sign a JWT token:
