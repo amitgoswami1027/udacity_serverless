@@ -118,7 +118,7 @@ WebSocket allows to implement bi-directional communication between a web applica
 * Real-time Notifications
 * Real-time Dashboards
 
-![](images/websocket1.png)
+![](images/wesocket1.png)
 ![](images/websocket2.png)
 
 WebSocket API provides two URLs: WebSocket URL and Connection URL.
@@ -148,6 +148,61 @@ Here is an example of how to react to WebSocket events using Serverless Framewor
     events:
       - websocket:
           route: $disconnect
+
+## AUTHENTICATION
+
+### AUTHENTICATION WITH API GATEWAY
+API Gateway is the entry point for API
+#### IAM Authentification
+![](images/iam.png)
+#### COGGNITO Authentification
+![](images/cognito.png)
+### Cognito Federated Architecture
+![](images/cognito_fed.png)
+The way Cognito Federated Identity works, it allows to obtain temporary, limited-privilege AWS credentials that can be used to access other AWS services.
+### CUSTOM AUTHORIZERS
+A custom authorizer is a Lambda function that is executed before processing a request. Custom authorizer returns an IAM policy that defines what Lambda functions can be called by a sender of a request. Notice, that the result of a custom authorizer call is cached. A good practice is to provide access to all functions an owner of a token can
+![](images/custom_auth.png)
+
+Here is an example of a custom authorizer:
+!exports.handler = async (event) => {
+   // Contains a token
+   const token = event.authorizationToken
+
+   // Check a token here
+
+  return {
+     principalId: 'user-id', // Unique user id
+     policyDocument: {
+       Version: '2012-10-17',
+       Statement: [
+         {
+           Action: 'execute-api:Invoke',
+           Effect: 'Allow',
+           Resource: '*'
+         }
+       ]
+     }
+   }
+ }
+
+### OAUTH2.0 PROTOCOL
+![](images/oauth.png)
+![](images/oauth_flow.png)
+![](images/oauthO_flow.png)
+
+
+OAuth allows to use one of the two algorithms that it can use to sign a JWT token:
+### Symmetric (HS256)
+    * The same key for signing a token (by Auth0) and verifying a token (by our application)
+    * We need to store this key and make it available to our application
+    * If this key leakes, an attacker can sign fraudulent JWT tokens.
+
+### Asymmetric (RS256)
+    * Different keys are used for signing and verifying a token
+    * Auth0 is responsible for storing a token
+
+
 
 
 # Serverless TODO
