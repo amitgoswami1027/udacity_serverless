@@ -91,7 +91,7 @@ Alternatively, we need to configure our application so that JavaScript would be 
 2. Set up a new user in IAM named "serverless" and save the access key and sec
 3. Configure serverless to use the AWS credentials you just set up
    * sls config credentials --provider aws --key YOUR_ACCESS_KEY --secret YOUR_SECRET_KEY --profile serverless
-   * serverless config credentials --provider aws --key AKIA5JZ3OPQUT676TN5A --secret QfgwGyLCpUd1eb6yiBoPQj95bbP8rhFpurOHrT0j --profile amitgoswami1027
+   * serverless config credentials --provider aws --key <> --secret <>--profile amitgoswami1027
 4. To create a serverless boilerplate project:
    * serverless create --template aws-nodejs-typescript --path 10-udagram-app
 5. To Deploy applicaion:
