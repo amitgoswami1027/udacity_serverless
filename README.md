@@ -91,17 +91,63 @@ Alternatively, we need to configure our application so that JavaScript would be 
 2. Set up a new user in IAM named "serverless" and save the access key and sec
 3. Configure serverless to use the AWS credentials you just set up
    * sls config credentials --provider aws --key YOUR_ACCESS_KEY --secret YOUR_SECRET_KEY --profile serverless
+   * serverless config credentials --provider aws --key AKIA5JZ3OPQUT676TN5A --secret QfgwGyLCpUd1eb6yiBoPQj95bbP8rhFpurOHrT0j --profile amitgoswami1027
 4. To create a serverless boilerplate project:
-   * sls create --template aws-nodejs-typescript --path 10-udagram-app
+   * serverless create --template aws-nodejs-typescript --path 10-udagram-app
 5. To Deploy applicaion:
    * Install the dependencies: npm install
    * Deploy the application: sls deploy -v
 6. NOTE: if you get a permissions error when you run deploy you may need to specify the user profile
    * sls deploy -v --aws-profile serverless
-   
+7. npm install aws-sdk --save-dev
 
+## DYNAMO DB 
+DynamoDB supports two indexes types:
+   a. Local secondary index (LSI):
+      * Like an additional sort key
+      * Allows to sort items by a different attribute
+      * Added on the data in a table
+   b. Global secondary index (GSI)
+      * Allows to define a new partition key for the same data
+      * Allows to define a new partition and sort key for the same data
+      * Creates copy of the data in a table (data is available via GSI after some delay)
 
+### WEBSOCKETS
+WebSocket allows to implement bi-directional communication between a web application and a server. It can be especially useful for applications like:
+* Messaging Applications
+* Real-time Notifications
+* Real-time Dashboards
 
+![](images/websocket1.png)
+![](images/websocket2.png)
+
+WebSocket API provides two URLs: WebSocket URL and Connection URL.
+### WebSocket URL:
+* Clients will use to connect to the API
+* Allows clients to send messages and receive notifications
+* Connection URL
+
+### Send a message back to a connected client
+* Lambda function will use to send messages
+* Requires a connection id to send a message to a particular client
+
+### Connection URL supports the following operations:
+* POST: to send a message to a client
+* GET: to get the latest connection status
+* DELETE: to disconnect a client from API
+
+Here is an example of how to react to WebSocket events using Serverless Framework:
+! ConnectHandler:
+    handler: src/websocket/connect.handler
+    events:
+      - websocket:
+          route: $connect
+
+ ! DisconnectHandler:
+    handler: src/websocket/disconnect.handler
+    events:
+      - websocket:
+          route: $disconnect
 
 
 # Serverless TODO
