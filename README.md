@@ -1,6 +1,6 @@
 # Udacity ServerlessProject
 
-# Theory Serverless Technologies
+# Serverless Technologies
 ## What is Serverless?
 1. A buzzword (not a pattern/technology/architecture)
 2. A spectrum of solutions
@@ -45,34 +45,32 @@ There are 3 invocation types:
 When implementing REST API with AWS Lambda our functions receive HTTP requests in the form of events. Each event contains information like HTTP method, HTTP body, headers, etc.A Lambda function should process this event and return a response that will be converted by AWS into an HTTP response.
 
 ### What is API Gateway
-    * Entry point for API users
-    * Pass requests to other services
-    * Process incoming requests
-    * REST API
-    * Websocket APIs
-    * Authentication
-    * Throttling & WAF
+* Entry point for API users
+* Pass requests to other services
+* Process incoming requests
+* REST API
+* Websocket APIs
+* Authentication
+* Throttling & WAF
 
 ### API Gateway targets
 Possible targets for an HTTP request processed by API Gateway:
-    * Lambda Function - call a Lambda function
-    * HTTP Endpoint - call a public HTTP endpoint
-    * AWS Service - send a request to an AWS service
-    * Mock - return a response without calling a backend
-    * VPC Link - access resource in an Amazon Virtual Private Cloud (VPC)
+* Lambda Function - call a Lambda function
+* HTTP Endpoint - call a public HTTP endpoint
+* AWS Service - send a request to an AWS service
+* Mock - return a response without calling a backend
+* VPC Link - access resource in an Amazon Virtual Private Cloud (VPC)
 
 ![](images/api_getway_concept.png)
 
 ### Lambda integration modes
-Proxy - passes all request information to a Lambda function. Easier to use.
-Non-proxy - allows to transform incoming request using Velocity Template Language
+* Proxy - passes all request information to a Lambda function. Easier to use.
+* Non-proxy - allows to transform incoming request using Velocity Template Language
 
 ![](images/lambda_integration.png)
 
 ## CORS ( Single-Origin request policy)
-Single-Origin request policy is enabled in all browsers by default and is an important security measure. To send requests from a web application to a different domain (e.g. from localhost to API Gateway domain) we need to configure Cross-Origin request policy in our API.
-
-Alternatively, we need to configure our application so that JavaScript would be served from the same domain that is used for our REST API, but this goes beyond the scope of this cours
+Single-Origin request policy is enabled in all browsers by default and is an important security measure. To send requests from a web application to a different domain (e.g. from localhost to API Gateway domain) we need to configure Cross-Origin request policy in our API.Alternatively, we need to configure our application so that JavaScript would be served from the same domain that is used for our REST API, but this goes beyond the scope of this cours
 
 ![](images/cors1.png)
 ![](images/cors2.png)
@@ -101,6 +99,22 @@ Alternatively, we need to configure our application so that JavaScript would be 
    * sls deploy -v --aws-profile serverless
 7. npm install aws-sdk --save-dev
 
+## PRESIGNED URL
+Presigned URL is a special URL pointing to an S3 bucket that can be used by anyone to upload/read an object. It can be used to access an S3 bucket even if it is private. 
+![](images/presignedurl.png)
+
+Here is a code snippet that can be used to generate a presigned URL:
+!! const s3 = new AWS.S3({
+   signatureVersion: 'v4' // Use Sigv4 algorithm
+ })
+ const presignedUrl = s3.getSignedUrl('putObject', { // The URL will allow to perform the PUT operation
+   Bucket: 's3-bucket-name', // Name of an S3 bucket
+   Key: 'object-id', // id of an object this URL allows access to
+   Expires: '300'  // A URL is only valid for 5 minutes
+ })
+ 
+#### https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
+ 
 ## DYNAMO DB 
 DynamoDB supports two indexes types:
    a. Local secondary index (LSI):
@@ -122,6 +136,7 @@ WebSocket allows to implement bi-directional communication between a web applica
 ![](images/websocket2.png)
 
 WebSocket API provides two URLs: WebSocket URL and Connection URL.
+
 ### WebSocket URL:
 * Clients will use to connect to the API
 * Allows clients to send messages and receive notifications
@@ -137,20 +152,26 @@ WebSocket API provides two URLs: WebSocket URL and Connection URL.
 * DELETE: to disconnect a client from API
 
 Here is an example of how to react to WebSocket events using Serverless Framework:
-! ConnectHandler:
+!! ConnectHandler:
     handler: src/websocket/connect.handler
     events:
       - websocket:
           route: $connect
 
- ! DisconnectHandler:
+ !! DisconnectHandler:
     handler: src/websocket/disconnect.handler
     events:
       - websocket:
           route: $disconnect
 
-## AUTHENTICATION
+#### Testing Websocket APIs
+PostMan doesnot supprot Websocket connections, so we can use the third party tool wscat -Websocket client CLI. 
+* INSTALL : npm install wscat -g
+* CONNECT : wscat -c wss://<aws url>
+* <message> <enter> to send meaages
+* Control-C to disconnect
 
+## AUTHENTICATION
 ### AUTHENTICATION WITH API GATEWAY
 API Gateway is the entry point for API
 #### IAM Authentification
@@ -165,12 +186,10 @@ A custom authorizer is a Lambda function that is executed before processing a re
 ![](images/custom_auth.png)
 
 Here is an example of a custom authorizer:
-!exports.handler = async (event) => {
+!!exports.handler = async (event) => {
    // Contains a token
    const token = event.authorizationToken
-
    // Check a token here
-
   return {
      principalId: 'user-id', // Unique user id
      policyDocument: {
@@ -191,7 +210,6 @@ Here is an example of a custom authorizer:
 ![](images/oauth_flow.png)
 ![](images/oauth0_flow.png)
 
-
 OAuth allows to use one of the two algorithms that it can use to sign a JWT token:
 ### Symmetric (HS256)
     * The same key for signing a token (by Auth0) and verifying a token (by our application)
@@ -201,8 +219,6 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
 ### Asymmetric (RS256)
     * Different keys are used for signing and verifying a token
     * Auth0 is responsible for storing a token
-
-
 
 
 # Serverless TODO
