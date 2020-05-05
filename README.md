@@ -99,8 +99,16 @@ Single-Origin request policy is enabled in all browsers by default and is an imp
    * sls deploy -v --aws-profile serverless
 7. npm install aws-sdk --save-dev
 
-## PRESIGNED URL
+# EVENT PROCESSING ( Event processing with Serverless)
+Feature to be Implemented:
+1. Image upload to S3
+2. Notify other users when new images are uploaded - Websockets support in API Gateway,Use S3 Notification - S3 can immit events when new file is upload in the bucket.
+3. Full- Text Search
+4. Use amazon SNS and conect Lambda functions with event sources.
+
+## UPLOADING FILES S3 - PRESIGNED URL
 Presigned URL is a special URL pointing to an S3 bucket that can be used by anyone to upload/read an object. It can be used to access an S3 bucket even if it is private. 
+
 ![](images/presignedurl.png)
 
 Here is a code snippet that can be used to generate a presigned URL:
@@ -115,16 +123,16 @@ Here is a code snippet that can be used to generate a presigned URL:
  
 #### https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
  
-## DYNAMO DB 
-DynamoDB supports two indexes types:
-   a. Local secondary index (LSI):
-      * Like an additional sort key
-      * Allows to sort items by a different attribute
-      * Added on the data in a table
-   b. Global secondary index (GSI)
-      * Allows to define a new partition key for the same data
-      * Allows to define a new partition and sort key for the same data
-      * Creates copy of the data in a table (data is available via GSI after some delay)
+## S3 Events : Here is a configuration snippet that can be used to subscribe to S3 events
+functions:
+  process:
+    handler: file.handler
+    events:
+      - s3: bucket-name
+        event: s3:ObjectCreated:*
+        rules:
+            - prefix: images/
+            - suffix: .png
 
 ### WEBSOCKETS
 WebSocket allows to implement bi-directional communication between a web application and a server. It can be especially useful for applications like:
@@ -170,6 +178,17 @@ PostMan doesnot supprot Websocket connections, so we can use the third party too
 * CONNECT : wscat -c wss://<aws url>
 * <message> <enter> to send meaages
 * Control-C to disconnect
+
+## DYNAMO DB 
+DynamoDB supports two indexes types:
+   a. Local secondary index (LSI):
+      * Like an additional sort key
+      * Allows to sort items by a different attribute
+      * Added on the data in a table
+   b. Global secondary index (GSI)
+      * Allows to define a new partition key for the same data
+      * Allows to define a new partition and sort key for the same data
+      * Creates copy of the data in a table (data is available via GSI after some delay)
 
 ## AUTHENTICATION
 ### AUTHENTICATION WITH API GATEWAY
