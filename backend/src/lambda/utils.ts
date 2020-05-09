@@ -13,4 +13,5 @@ export function getUserId(event: APIGatewayProxyEvent): string {
   const jwtToken = split[1]
 
   return parseUserId(jwtToken)
+  
 }
