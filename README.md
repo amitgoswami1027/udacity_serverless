@@ -84,21 +84,25 @@ Single-Origin request policy is enabled in all browsers by default and is an imp
 * INSTALL PLUGIN : npm install plugin-name --save-dev
 * DEPLOY PROJECT : sls deploy -v
 
-### STEPS FOR FIRST SERVERLESS FRAMEWORK DEMO
+### STEPS FOR FIRST SERVERLESS FRAMEWORK DEMO (Sequence of steps for setting up the serverless framework)
 1. npm install -g serverless
 2. Set up a new user in IAM named "serverless" and save the access key and sec
 3. Configure serverless to use the AWS credentials you just set up
    * sls config credentials --provider aws --key YOUR_ACCESS_KEY --secret YOUR_SECRET_KEY --profile serverless
-   * serverless config credentials --provider aws --key <> --secret <>--profile amitgoswami1027
+   * serverless config  credentials --provider aws --key <> --secret <> --profile amitgoswami1027
 4. To create a serverless boilerplate project:
    * serverless create --template aws-nodejs-typescript --path 10-udagram-app
+   * serverless create --template aws-nodejs-typescript --path serverlessbackend
 5. To Deploy applicaion:
    * Install the dependencies: npm install
    * Deploy the application: sls deploy -v
+   * serverless deploy --stage dev --region us-east-1
 6. NOTE: if you get a permissions error when you run deploy you may need to specify the user profile
-   * sls deploy -v --aws-profile serverless
+   * sls deploy -v --aws-profile amitgoswami1027
 7. npm install aws-sdk --save-dev
-
+8. Other commands
+   * npm install aws-sdk
+   * npm install axios
 # EVENT PROCESSING ( Event processing with Serverless)
 Feature to be Implemented:
 1. Image upload to S3
