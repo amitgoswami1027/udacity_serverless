@@ -1,5 +1,5 @@
 service:
-  name: ross-serverless-todo-app
+  name: serverless-todo-app
 
 plugins:
   - serverless-webpack
@@ -10,11 +10,11 @@ provider:
   runtime: nodejs10.x
 
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-west-1'}
+  region: ${opt:region, 'us-east-1'}
 
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
-    AUTH_0_SECRET: z2JvJFPCw4F2SljDrRt2tQQIy9e3MArsWEYFv2MVpyTjO4b5DVjXhHqfewYvvjvg
+    AUTH_0_SECRET: zzJrcVKE0g3BMxFPUcbAz26TkfR16Gd40xbIRdp3Li_mbtsd0Mmdm0NVk0_SKV4G
     S3_BUCKET: ross-serverless-todo-s3-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
@@ -27,9 +27,13 @@ functions:
     handler: src/lambda/http/getTodos.handler
     events:
       - http:
-          method: get
+          method: get 
           path: todos
-          cors: true
+          cors: 
+            - enabled: true
+            - origin: '*'
+            - headers: 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+          authorizer: Auth
     iamRoleStatementsName: ${self:service.name}-get-todos-role-${self:provider.stage}
     iamRoleStatements:
     - Effect: Allow
