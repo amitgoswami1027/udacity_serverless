@@ -16,16 +16,15 @@ const logger = createLogger('auth')
 
 const authSecret = process.env.AUTH_0_SECRET
 
-export const handler = async (
-  event: CustomAuthorizerEvent
-): Promise<CustomAuthorizerResult> => {
+export const handler = async ( event: CustomAuthorizerEvent ): Promise<CustomAuthorizerResult> => {
+  
   logger.info('Authorizing a user', event.authorizationToken)
   try {
-    const jwtToken = await verifyToken(event.authorizationToken)
-    logger.info('User was authorized', jwtToken)
+    const decodejwtToken = await verifyToken(event.authorizationToken)
+    logger.info('User was authorized', decodejwtToken)
 
     return {
-      principalId: jwtToken.sub,
+      principalId: decodejwtToken.sub,
       policyDocument: {
         Version: '2012-10-17',
         Statement: [
@@ -56,7 +55,8 @@ export const handler = async (
   }
 }
 
-async function verifyToken(authHeader: string): Promise<JwtPayload> {
+async function verifyToken(authHeader: string): Promise<JwtPayload> 
+{
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
   console.log(jwt)
@@ -66,7 +66,8 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   return verify(token, authSecret) as JwtPayload
 }
 
-function getToken(authHeader: string): string {
+function getToken(authHeader: string): string 
+{
   if (!authHeader) throw new Error('No authentication header')
 
   if (!authHeader.toLowerCase().startsWith('bearer '))
