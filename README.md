@@ -194,8 +194,7 @@ DynamoDB supports two indexes types:
       * Allows to define a new partition and sort key for the same data
       * Creates copy of the data in a table (data is available via GSI after some delay)
 
-## AUTHENTICATION
-### AUTHENTICATION WITH API GATEWAY
+## AUTHENTICATION ( Who you are?)
 API Gateway is the entry point for API
 #### IAM Authentification
 ![](images/iam.png)
@@ -204,6 +203,7 @@ API Gateway is the entry point for API
 ### Cognito Federated Architecture
 ![](images/cognito_fed.png)
 The way Cognito Federated Identity works, it allows to obtain temporary, limited-privilege AWS credentials that can be used to access other AWS services.
+
 ### CUSTOM AUTHORIZERS
 A custom authorizer is a Lambda function that is executed before processing a request. Custom authorizer returns an IAM policy that defines what Lambda functions can be called by a sender of a request. Notice, that the result of a custom authorizer call is cached. A good practice is to provide access to all functions an owner of a token can
 ![](images/custom_auth.png)
@@ -229,11 +229,13 @@ Here is an example of a custom authorizer:
  }
 
 ### OAUTH2.0 PROTOCOL
-![](images/oauth.png)
-![](images/oauth_flow.png)
-![](images/oauth0_flow.png)
+* OAuto 2.0 : Authorization for third party app to get resources (eg. google contacts)
+* OpenID : Authentication on the top of OAuth.
 
+OAuth returns JWT tokens. JWT contain informaitona about user, no need to send the request to Auth0 to verify JWT.
+What prevents anyone to use JWT tokens? JWT tokens are signed by Auth0. Auth0 has two ways to sign the JWT tokens.
 OAuth allows to use one of the two algorithms that it can use to sign a JWT token:
+
 ### Symmetric (HS256)
     * The same key for signing a token (by Auth0) and verifying a token (by our application)
     * We need to store this key and make it available to our application
@@ -242,10 +244,29 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
 ### Asymmetric (RS256)
     * Different keys are used for signing and verifying a token
     * Auth0 is responsible for storing a token
+![](images/oauth.png)
+![](images/oauth_flow.png)
+![](images/oauth0_flow.png)
 
+## STEPS
+1. First step is to create the Autho application. Go to Auth0.com.
+2. Auth0 will return the token when it return to our applciation. On React applicaiton have speical route to process the token. Front end will store the token. Should send it with the requests to our service once we have it.
+3. How to Store JWT Tokens: It can be stored in local or session storage (bad practice - opened to XSS attacks). RECOMMANDED to store JWT tokens in the server side cookie.
+4. Concept of a server-side cookie, and suggests using it to store a JWT token.
+   A server-side cookie is a type of cookie that is set by an HTTP server, but its value will not be available to JavaScript code  
+   running in a browser. A value of a server-side cookie is only available to a browser, and it will automatically send with requests as 
+   a normal cookie. Since a cookie is not available to JavaScript code running in a browser it cannot be accessed by any malicious code. 
+   If a JWT token is stored in a server-side cookie it can be used for authentication in a more secure fashion.
+   Notice that in this course and in many other examples online JWT tokens are stored in a local storage. While this is a simpler option 
+   that is sufficient for demos it is not secure and is discouraged.
+5. For current application, to be simple we store JWT token in memory.
+6. Storing Secerts in Environment Variables are not good Idea. We can use the following services:
+   * SSM Parameter Store
+   * AWS Secret Manager
+   * Third party applications/tools like HashiCorp Vault.
 
-# Serverless TODO
-
+--------------------------------------------------------------------------------------------------------------------------------------
+# Serverless TODO (Project Assignment Steps)
 To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
 
 # Functionality of the application
@@ -253,7 +274,6 @@ To implement this project, you need to implement a simple TODO application using
 This application will allow creating/removing/updating/fetching TODO items. Each TODO item can optionally have an attachment image. Each user only has access to TODO items that he/she has created.
 
 # TODO items
-
 The application should store TODO items, and each TODO item contains the following fields:
 
 * `todoId` (string) - a unique id for an item
@@ -264,7 +284,6 @@ The application should store TODO items, and each TODO item contains the followi
 * `attachmentUrl` (string) (optional) - a URL pointing to an image attached to a TODO item
 
 You might also store an id of a user who created a TODO item.
-
 
 # Functions to be implemented
 
@@ -515,3 +534,6 @@ Right click on the imported collection to set variables for the collection:
 Provide variables for the collection (similarly to how this was done in the course):
 
 ![Alt text](images/import-collection-5.png?raw=true "Image 5")
+
+# Interesting Links to Read
+## Cloud Vendor Lock-in : https://martinfowler.com/articles/oss-lockin.html
