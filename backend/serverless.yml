@@ -14,6 +14,7 @@ provider:
 
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
+    TODOS_INDEX_NAME: UserIdIndex
     AUTH_0_SECRET: zzJrcVKE0g3BMxFPUcbAz26TkfR16Gd40xbIRdp3Li_mbtsd0Mmdm0NVk0_SKV4G
     S3_BUCKET: goswami-serverless-todo-s3-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
@@ -122,7 +123,6 @@ resources:
         ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: ApiGatewayRestApi
-
   
     # TODO: Add any necessary AWS resources
     TodosDynamoDBTable:
@@ -137,7 +137,7 @@ resources:
           - AttributeName: todoId
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: UserIdIndex
+          - IndexName: ${self:provider.environment.TODOS_INDEX_NAME}
             KeySchema:
             - AttributeName: userId
               KeyType: HASH
@@ -145,7 +145,7 @@ resources:
               ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
-      
+        
     AttachmentBucket:
       Type: AWS::S3::Bucket
       Properties:

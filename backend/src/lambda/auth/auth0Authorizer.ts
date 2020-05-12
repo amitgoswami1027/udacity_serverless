@@ -7,14 +7,17 @@ import { createLogger } from '../../utils/logger'
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 
-const logger = createLogger('auth')
+import Axios from 'axios';
+
+const logger = createLogger('auth');
+const jwksUrl = 'https://junglebadger.auth0.com/.well-known/jwks.json';
 
 // TODO: Provide a URL that can be used to download a certificate that can be used
 // to verify JWT token signature.
 // To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
 //const jwksUrl = 'https://dev-rcrwdmsb.auth0.com/.well-known/jwks.json'
 
-const authSecret = process.env.AUTH_0_SECRET
+//const authSecret = process.env.AUTH_0_SECRET
 
 export const handler = async ( event: CustomAuthorizerEvent ): Promise<CustomAuthorizerResult> => {
   
@@ -63,7 +66,26 @@ async function verifyToken(authHeader: string): Promise<JwtPayload>
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return verify(token, authSecret) as JwtPayload
+//  return verify(token, authSecret) as JwtPayload
+
+  const jwtKid = jwt.header.kid;
+  let cert: string | Buffer;
+
+  try {
+    const jwks = await Axios.get(jwksUrl);
+    const signingKey = jwks.data.keys.filter(k => k.kid === jwtKid)[0];
+
+    if (!signingKey) {
+      throw new Error(`Unable to find a signing key that matches '${jwtKid}'`);
+    }
+    const { x5c } = signingKey;
+
+    cert = `-----BEGIN CERTIFICATE-----\n${x5c[0]}\n-----END CERTIFICATE-----`;
+  } catch (error) {
+    console.log('Error While getting Certificate : ', error);
+  }
+
+  return verify(token, cert, { algorithms: ['RS256'] }) as JwtPayload;
 }
 
 function getToken(authHeader: string): string 

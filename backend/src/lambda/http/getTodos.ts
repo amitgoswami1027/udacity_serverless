@@ -1,41 +1,51 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
 import 'source-map-support/register'
-import { parseUserId } from '../../auth/utils'
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
+//import { getAllTodos } from "../../Logic/todos";
+import { parseUserId } from '../../auth/utils';
+import { createLogger } from '../../utils/logger';
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-const todosTable = process.env.TODOS_TABLE
+const logger = createLogger('getTodo');
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    
-    console.log("EVENT:", event);
 
-    const authHeader = event.headers.Authorization
-    const authSplit = authHeader.split(" ")
-    const userId = parseUserId(authSplit[1])
-    
-    const result = await docClient.query({
-        TableName : todosTable,
-        IndexName: "UserIdIndex",
-        KeyConditionExpression: 'userId = :userId',
-        ExpressionAttributeValues: {
-            ':userId': userId
-        },
+export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  // TODO: Get all TODO items for a current user
+  console.log('Processing event: ', event)
+  const authorization = event.headers.Authorization;
+  const split = authorization.split(' ');
+  const jwtToken = split[1];
+  const userId = parseUserId(jwtToken);
+console.log("userid : ",userId,"jwtToken : ",jwtToken);
   
-        ScanIndexForward: false
-    }).promise()
+const result = await this.docClient.query({
+  TableName: this.todosTable,
+  IndexName: this.indexName,
+  KeyConditionExpression: 'userId = :userId',
+  ExpressionAttributeValues: {
+      ':userId': userId
+  }
+}).promise();
 
-    const items = result.Items
+//const todos = await getAllTodos(userId);
+  
+  
+  logger.info(`get all Todo for user ${userId}`);
+  return {
+    statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
+    },
+    body: JSON.stringify({
+      items: result
+    })
+};
+})
 
-    return {
-        statusCode: 200,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': true
-        },
-        body: JSON.stringify({
-            items
-        })
-    }
-}
+handler.use(
+  cors({
+    credentials: true
+  })
+)
