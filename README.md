@@ -508,5 +508,10 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
    * Third party applications/tools like HashiCorp Vault.
 
 --------------------------------------------------------------------------------------------------------------------------------------
+### Udacity Problem Solving :
+https://knowledge.udacity.com/questions/167880
+
 # Interesting Links to Read
 ## Cloud Vendor Lock-in : https://martinfowler.com/articles/oss-lockin.html
+## JWT Must Read : https://redthunder.blog/2017/06/08/jwts-jwks-kids-x5ts-oh-my/
+
