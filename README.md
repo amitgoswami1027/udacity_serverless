@@ -345,6 +345,7 @@ Single-Origin request policy is enabled in all browsers by default and is an imp
 8. Other commands
    * npm install aws-sdk
    * npm install axios
+   * npm install middy --save
 # EVENT PROCESSING ( Event processing with Serverless)
 Feature to be Implemented:
 1. Image upload to S3
