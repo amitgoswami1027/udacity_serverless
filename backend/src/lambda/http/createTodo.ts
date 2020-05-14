@@ -1,46 +1,59 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
 import 'source-map-support/register'
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
+import { parseUserId } from '../../auth/utils';
+import { createLogger } from '../../utils/logger';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as uuid from 'uuid'
-import { parseUserId } from '../../auth/utils'
+import * as AWS from 'aws-sdk'
 
+import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 const docClient = new AWS.DynamoDB.DocumentClient()
 
+const logger = createLogger('createTodo');
 const todosTable = process.env.TODOS_TABLE
+//const todosTable = process.env.TODOS_TABLE
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    
-    console.log("EVENT:", event);
+export const handler= middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  const newTodo: CreateTodoRequest = JSON.parse(event.body)
+  
+  const itemId = uuid.v4();
+  const parsedBody = JSON.parse(event.body)
+  // TODO: Implement creating a new TODO item
+  const authorization = event.headers.Authorization;
+  const split = authorization.split(' ');
+  const jwtToken = split[1];
+  const userId = parseUserId(jwtToken);
 
-    const todoId = uuid.v4()
+  const newItem = {
+      todoId: itemId,
+      userId: userId,
+      ...parsedBody
+  }
 
-    const parsedBody = JSON.parse(event.body)
+  await docClient.put({
+      TableName: todosTable,
+      Item: newItem
+  }).promise()
 
-    const authHeader = event.headers.Authorization
-    const authSplit = authHeader.split(" ")
-    const token = authSplit[1]
 
-    console.log("test",token)
+  logger.info(`create Todo for user ${userId} with data ${newTodo}`);
+  return {
+    statusCode: 201,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
+    },
+    body: JSON.stringify({
+      item :{
+        ...newItem,
+      }
+    }),
+};
+})
 
-    const item = {
-      todoId: todoId,
-        userId: parseUserId(token),
-        ...parsedBody
-    }
-
-    await docClient.put({
-        TableName: todosTable,
-        Item: item
-    }).promise()
-
-    return {
-        statusCode: 201,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': true
-        },
-        body: JSON.stringify({
-          item
-        })
-    }
-}
+handler.use(
+  cors({
+    credentials: true
+  })
+)
