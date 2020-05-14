@@ -23,6 +23,7 @@ export async function createTodo(
 ): Promise<Todo> {
   const response = await Axios.post(`${apiEndpoint}/todos`,  JSON.stringify(newTodo), {
     headers: {
+      'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`
     }
