@@ -11,7 +11,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   console.log(todoId)
   const bucket = process.env.S3_BUCKET
-  const url_exp = process.env.SIGNED_URL_EXPIRATION
+ // const url_exp = process.env.SIGNED_URL_EXPIRATION
   const todosTable = process.env.TODOS_TABLE
 
   const imageId = uuid.v4()
@@ -25,7 +25,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const url = s3.getSignedUrl('putObject',{
     Bucket: bucket,
     Key: imageId,
-    Expires: url_exp
+    Expires: 300
   })
 
   const imageUrl = `https://${bucket}.s3.amazonaws.com/${imageId}`

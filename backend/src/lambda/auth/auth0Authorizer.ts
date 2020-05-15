@@ -17,6 +17,7 @@ const jwksUrl = 'https://dev-lo4kzqz7.auth0.com/.well-known/jwks.json'
 export const handler = async (
   event: CustomAuthorizerEvent
 ): Promise<CustomAuthorizerResult> => {
+
   logger.info('Authorizing a user', event.authorizationToken)
   try {
     const jwtToken = await verifyToken(event.authorizationToken)
@@ -69,17 +70,18 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
 
 }
 
- function  getToken(authHeader: string): string {
-  if (!authHeader) throw new Error('No authentication header')
+ function  getToken(authHeader: string): string 
+ {
+   if (!authHeader) throw new Error('No authentication header')
 
-  if (!authHeader.toLowerCase().startsWith('bearer '))
-    throw new Error('Invalid authentication header')
+   if (!authHeader.toLowerCase().startsWith('bearer '))
+     throw new Error('Invalid authentication header')
 
-  const split = authHeader.split(' ')
-  const token = split[1]
+   const split = authHeader.split(' ')
+   const token = split[1]
 
-  return token
-}
+   return token
+ }
 
 const getSigningKey = async (jwkurl, kid) => {
   let res = await Axios.get(jwkurl, {
@@ -89,17 +91,20 @@ const getSigningKey = async (jwkurl, kid) => {
       'Access-Control-Allow-Credentials': true,
     }
   });
+  
   let keys  = res.data.keys;
   // since the keys is an array its possible to have many keys in case of cycling.
   const signingKeys = keys.filter(key => key.use === 'sig' // JWK property `use` determines the JWK is for signing
-      && key.kty === 'RSA' // We are only supporting RSA
-      && key.kid           // The `kid` must be present to be useful for later
-      && key.x5c && key.x5c.length // Has useful public keys (we aren't using n or e)
-    ).map(key => {
-      return { kid: key.kid, nbf: key.nbf, publicKey: certToPEM(key.x5c[0]) };
-    });
+                                  && key.kty === 'RSA' // We are only supporting RSA
+                                  && key.kid           // The `kid` must be present to be useful for later
+                                  && key.x5c && key.x5c.length // Has useful public keys (we aren't using n or e)
+                                  ).map(key => {
+                                    return { kid: key.kid, nbf: key.nbf, publicKey: certToPEM(key.x5c[0]) };
+                                  });
+  
   const signingKey = signingKeys.find(key => key.kid === kid);
-  if(!signingKey){
+  if(!signingKey)
+  {
     throw new Error('Invalid signing keys')
     logger.error("No signing keys found")
   }
@@ -109,7 +114,8 @@ const getSigningKey = async (jwkurl, kid) => {
 
 };
 
-function certToPEM(cert) {
+function certToPEM(cert) 
+{
   cert = cert.match(/.{1,64}/g).join('\n');
   cert = `-----BEGIN CERTIFICATE-----
   MIIDBzCCAe+gAwIBAgIJAtsKWsu9SV52MA0GCSqGSIb3DQEBCwUAMCExHzAdBgNV
