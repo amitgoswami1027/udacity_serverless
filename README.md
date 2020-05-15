@@ -519,6 +519,19 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
    * AWS Secret Manager
    * Third party applications/tools like HashiCorp Vault.
 
+### Bucket CORS Policy
+!! <?xml version="1.0" encoding="UTF-8"?>
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>POST</AllowedMethod>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedMethod>DELETE</AllowedMethod>
+    <AllowedMethod>HEAD</AllowedMethod>
+    <AllowedHeader>*</AllowedHeader>
+</CORSRule>
+</CORSConfiguration>
 --------------------------------------------------------------------------------------------------------------------------------------
 ### Udacity Problem Solving :
 https://knowledge.udacity.com/questions/167880
