@@ -171,18 +171,21 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
+          - s3:PutObject
+          - s3:GetObject
+        Resource: "arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*"
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:PutItem
           - dynamodb:UpdateItem
-          - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
         Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*
-      - Effect: "Allow"
-        Action:
-          - xray:PutTelemetryRecords
-          - xray:PutTraceSegments
-        Resource: "*"
+          - "xray:PutTraceSegments"
+          - "xray:PutTelemetryRecords"
+        Resource:
+          - "*"
 
 resources:
   Resources:
