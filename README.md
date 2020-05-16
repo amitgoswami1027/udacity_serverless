@@ -26,7 +26,7 @@ Ensure we cannot create invalid objects. These are the two options:
         ValidateRequestBody: true
         ValidateRequestParameters: false
 ```
-#### Step-05 : Specify which function should be validated by the above validator
+* Step-05 : Specify which function should be validated by the above validator
 ```CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
@@ -51,9 +51,10 @@ Ensure we cannot create invalid objects. These are the two options:
               requestModels:
                 'application/json': CreateTodoRequest
 ```
-#### Step-06 : serverless deploy -v [Done]
+* Step-06 : serverless deploy -v [Done]
 ![](images/reqvalidator.png)
 ![](images/jsonval.png)
+
 3. [Architecture] : 1:M (1 to many) relationship between users and TODO items is modeled using a DynamoDB table that has a composite key with both partition and sort keys. Should be defined similar to this:
 * Review Comments: You have chosen todoId for your primary key and not chosen a sort key (RANGE). Unfortunately, this is a project requirement: 1:M (1 to many) relationship between users (userId) and TODO items (todoId). Each user (userId) can have many items assigned to it (name, attached-images, due-date, ...). You should use HASH and RANGE keys for DynamoDB Table.
 #### [Learnings] : 
