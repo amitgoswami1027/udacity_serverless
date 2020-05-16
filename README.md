@@ -16,7 +16,7 @@ Ensure we cannot create invalid objects. These are the two options:
 #### Step-02 : Add - serverless-reqvalidator-plugin and - serverless-aws-documentation the plug-in section of serverless.yml file.
 #### Step-03 : Create "Custom" section in serverless.yml file and provide the provide the JSON request models.
 #### Step-04 : Create following under the "Resources" section of the serverless.yml file.
-'''Resources:    
+```Resources:    
       RequestBodyValidator:
       Type: AWS::ApiGateway::RequestValidator
       Properties:
@@ -25,9 +25,9 @@ Ensure we cannot create invalid objects. These are the two options:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: true
         ValidateRequestParameters: false
-'''
-#### Step-05 : Specify which function should be validated by the above validator.
-'''  CreateTodo:
+```
+#### Step-05 : Specify which function should be validated by the above validator
+```CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
       - http:
@@ -50,7 +50,7 @@ Ensure we cannot create invalid objects. These are the two options:
               description: Create a new Todo Items
               requestModels:
                 'application/json': CreateTodoRequest
-'''
+```
 #### Step-06 : serverless deploy -v [Done]
 ![](images/reqvalidator.png)
 ![](images/jsonval.png)
@@ -69,7 +69,7 @@ NOTE. If a table has a composite key, there can be multiple items with the same 
  * details: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.Partitions.html
  * https://aws.amazon.com/blogs/database/choosing-the-right-dynamodb-partition-key/
 
-'''    TodosDynamoDBTable:
+```TodosDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
@@ -93,8 +93,7 @@ NOTE. If a table has a composite key, there can be multiple items with the same 
         StreamSpecification:
           StreamViewType: NEW_IMAGE
         TableName: ${self:provider.environment.TODOS_TABLE}
-'''
-
+```
 ![](images/partition_sort_key.png)
 ![](images/partition_sort_key_explain.png)
 
@@ -470,7 +469,7 @@ Presigned URL is a special URL pointing to an S3 bucket that can be used by anyo
 ![](images/presignedurl.png)
 
 Here is a code snippet that can be used to generate a presigned URL:
-!! const s3 = new AWS.S3({
+``` const s3 = new AWS.S3({
    signatureVersion: 'v4' // Use Sigv4 algorithm
  })
  const presignedUrl = s3.getSignedUrl('putObject', { // The URL will allow to perform the PUT operation
@@ -478,11 +477,11 @@ Here is a code snippet that can be used to generate a presigned URL:
    Key: 'object-id', // id of an object this URL allows access to
    Expires: '300'  // A URL is only valid for 5 minutes
  })
- 
+ ```
 #### https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
  
 ## S3 Events : Here is a configuration snippet that can be used to subscribe to S3 events
-functions:
+```functions:
   process:
     handler: file.handler
     events:
@@ -491,7 +490,7 @@ functions:
         rules:
             - prefix: images/
             - suffix: .png
-
+```
 ### WEBSOCKETS
 WebSocket allows to implement bi-directional communication between a web application and a server. It can be especially useful for applications like:
 * Messaging Applications
@@ -518,18 +517,18 @@ WebSocket API provides two URLs: WebSocket URL and Connection URL.
 * DELETE: to disconnect a client from API
 
 Here is an example of how to react to WebSocket events using Serverless Framework:
-!! ConnectHandler:
+``` ConnectHandler:
     handler: src/websocket/connect.handler
     events:
       - websocket:
           route: $connect
 
- !! DisconnectHandler:
+  DisconnectHandler:
     handler: src/websocket/disconnect.handler
     events:
       - websocket:
           route: $disconnect
-
+```
 #### Testing Websocket APIs
 PostMan doesnot supprot Websocket connections, so we can use the third party tool wscat -Websocket client CLI. 
 * INSTALL : npm install wscat -g
@@ -563,7 +562,7 @@ A custom authorizer is a Lambda function that is executed before processing a re
 ![](images/custom_auth.png)
 
 Here is an example of a custom authorizer:
-!!exports.handler = async (event) => {
+```exports.handler = async (event) => {
    // Contains a token
    const token = event.authorizationToken
    // Check a token here
@@ -581,7 +580,7 @@ Here is an example of a custom authorizer:
      }
    }
  }
-
+```
 ### OAUTH2.0 PROTOCOL
 * OAuto 2.0 : Authorization for third party app to get resources (eg. google contacts)
 * OpenID : Authentication on the top of OAuth.
@@ -620,7 +619,7 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
    * Third party applications/tools like HashiCorp Vault.
 
 ### Bucket CORS Policy
-!! <?xml version="1.0" encoding="UTF-8"?>
+``` <?xml version="1.0" encoding="UTF-8"?>
 <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
 <CORSRule>
     <AllowedOrigin>*</AllowedOrigin>
@@ -632,6 +631,7 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
     <AllowedHeader>*</AllowedHeader>
 </CORSRule>
 </CORSConfiguration>
+```
 --------------------------------------------------------------------------------------------------------------------------------------
 ### Udacity Problem Solving :
 https://knowledge.udacity.com/questions/167880
