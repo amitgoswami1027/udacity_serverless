@@ -6,17 +6,18 @@
 database access, file storage and code related to AWS Lambda.To separate code for database access and file storage, kindly create two folders: src/businessLogic and src/dataLayer. [Done]
 2. [Incoming HTTP requests are validated either in Lambda handlers or using request validation in API Gateway. The latter can be done either using the serverless-reqvalidator-plugin or by providing request schemas in function definitions.]  Request validation is required for this project:using the serverless-reqvalidator-plugin or by providing request schemas in function definitions.
 Ensure we cannot create invalid objects. These are the two options:
-* Use serverless-reqvalidator-plugin serverless framework plugin.
-* Use request schema (request.schema:), .json definitions, in serverless.yml file under the functions, e.g. CreateTodo:, UpdateTodo:, in functions: section. For more information enabling request schema validation (.json definitions) kindly have a look at:
-* Links for Reference-1 : https://www.youtube.com/watch?v=mxOgm8ldJKU&feature=youtu.be
-* Links for Reference-2 : https://www.serverless.com/framework/docs/providers/aws/events/apigateway/#request-schema-validators
-* Links for Reference-3 : https://json-schema.org/
-### STEPS: (Done)
-* Step-01 Commands: * npm install serverless-aws-documentation serverless-reqvalidator-plugin --save-dev
-* Step-02 : Add - serverless-reqvalidator-plugin and - serverless-aws-documentation the plug-in section of serverless.yml file.
-* Step-03 : Create "Custom" section in serverless.yml file and provide the provide the JSON request models.
-* Step-04 : Create following under the "Resources" section of the serverless.yml file.
-```Resources:    
+ * Use serverless-reqvalidator-plugin serverless framework plugin.
+ * Use request schema (request.schema:), .json definitions, in serverless.yml file under the functions, e.g. CreateTodo:, UpdateTodo:,  
+   in functions: section. For more information enabling request schema validation (.json definitions) kindly have a look at:
+ * Links for Reference-1 : https://www.youtube.com/watch?v=mxOgm8ldJKU&feature=youtu.be
+ * Links for Reference-2 : https://www.serverless.com/framework/docs/providers/aws/events/apigateway/#request-schema-validators
+ * Links for Reference-3 : https://json-schema.org/
+ ### STEPS: (Done)
+ * Step-01 Commands: * npm install serverless-aws-documentation serverless-reqvalidator-plugin --save-dev
+ * Step-02 : Add - serverless-reqvalidator-plugin and - serverless-aws-documentation the plug-in section of serverless.yml file.
+ * Step-03 : Create "Custom" section in serverless.yml file and provide the provide the JSON request models.
+ * Step-04 : Create following under the "Resources" section of the serverless.yml file.
+ ```Resources:    
       RequestBodyValidator:
       Type: AWS::ApiGateway::RequestValidator
       Properties:
@@ -25,9 +26,9 @@ Ensure we cannot create invalid objects. These are the two options:
           Ref: ApiGatewayRestApi
         ValidateRequestBody: true
         ValidateRequestParameters: false
-```
-* Step-05 : Specify which function should be validated by the above validator
-```CreateTodo:
+ ```
+ * Step-05 : Specify which function should be validated by the above validator
+ ```CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
       - http:
@@ -50,10 +51,10 @@ Ensure we cannot create invalid objects. These are the two options:
               description: Create a new Todo Items
               requestModels:
                 'application/json': CreateTodoRequest
-```
-* Step-06 : serverless deploy -v [Done]
-![](images/reqvalidator.png)
-![](images/jsonval.png)
+ ```
+ * Step-06 : serverless deploy -v [Done]
+ ![](images/reqvalidator.png)
+ ![](images/jsonval.png)
 
 3. [Architecture] : 1:M (1 to many) relationship between users and TODO items is modeled using a DynamoDB table that has a composite key with both partition and sort keys. Should be defined similar to this:
 * Review Comments: You have chosen todoId for your primary key and not chosen a sort key (RANGE). Unfortunately, this is a project requirement: 1:M (1 to many) relationship between users (userId) and TODO items (todoId). Each user (userId) can have many items assigned to it (name, attached-images, due-date, ...). You should use HASH and RANGE keys for DynamoDB Table.
