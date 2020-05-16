@@ -1,49 +1,44 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
 import 'source-map-support/register'
-//import { parseUserId } from '../../auth/utils'
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
+import { parseUserId } from '../../auth/utils';
+import { createLogger } from '../../utils/logger';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { updateTodo } from "../../BusinessLogic/todos";
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 
+// Using Winston
+const logger = createLogger('updateTodo');
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => 
+{
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const todoId = event.pathParameters.todoId
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
 
-  const todosTable = process.env.TODOS_TABLE
-
   // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
-
-  //const authHeader = event.headers.Authorization
-  //const authSplit = authHeader.split(" ")
-  //const token = authSplit[1]
-
-  const updateTodoParams = {
-    TableName: todosTable,
-    Key: { "todoId": todoId },
-    UpdateExpression: "set #n = :a, dueDate = :b, done = :c",
-    ExpressionAttributeValues:{
-      ":a": updatedTodo['name'],
-      ":b": updatedTodo.dueDate,
-      ":c": updatedTodo.done
+  const authorization = event.headers.Authorization;
+  const split = authorization.split(' ');
+  const jwtToken = split[1];
+  const userId = parseUserId(jwtToken);
+  
+  logger.info(`User ${userId} update todo ${todoId} with values ${updatedTodo}`)
+  
+  await updateTodo(todoId, updatedTodo);
+  
+  return {
+    statusCode: 204,
+    headers: 
+    {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
     },
-    ExpressionAttributeNames:{
-      "#n": "name"
-    },
-    ReturnValues:"UPDATED_NEW"
-  }
+    body: '',
+};
+})
 
-const runthis = await docClient.update(updateTodoParams).promise()
-
-return {
-    statusCode: 201,
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true
-    },
-    body: JSON.stringify({
-      runthis
+handler.use(
+    cors({
+      credentials: true
     })
-}
-}
+  )

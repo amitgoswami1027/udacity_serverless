@@ -4,40 +4,27 @@ import { cors } from 'middy/middlewares'
 import { parseUserId } from '../../auth/utils';
 import { createLogger } from '../../utils/logger';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import * as uuid from 'uuid'
-import * as AWS from 'aws-sdk'
-
+import { createTodo } from "../../BusinessLogic/todos";
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
-const docClient = new AWS.DynamoDB.DocumentClient()
 
+// Using Winston for logging
 const logger = createLogger('createTodo');
-const todosTable = process.env.TODOS_TABLE
-//const todosTable = process.env.TODOS_TABLE
 
 export const handler= middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
   
-  const itemId = uuid.v4();
-  const parsedBody = JSON.parse(event.body)
-  // TODO: Implement creating a new TODO item
-  const authorization = event.headers.Authorization;
-  const split = authorization.split(' ');
-  const jwtToken = split[1];
-  const userId = parseUserId(jwtToken);
+ // TODO: Implement creating a new TODO item
+ const authorization = event.headers.Authorization;
+ const split = authorization.split(' ');
+ const jwtToken = split[1];
+ const userId = parseUserId(jwtToken);
 
-  const newItem = {
-      todoId: itemId,
-      userId: userId,
-      ...parsedBody
-  }
+ // Decopuling the Business logic and DB Function
+ const newItem = await createTodo(newTodo, userId);
 
-  await docClient.put({
-      TableName: todosTable,
-      Item: newItem
-  }).promise()
+ // Logging userId and newTodo
+ logger.info(`create Todo for user ${userId} with data ${newTodo}`);
 
-
-  logger.info(`create Todo for user ${userId} with data ${newTodo}`);
   return {
     statusCode: 201,
     headers: {
@@ -52,6 +39,7 @@ export const handler= middy(async (event: APIGatewayProxyEvent): Promise<APIGate
 };
 })
 
+//Taking care of CORS
 handler.use(
   cors({
     credentials: true
