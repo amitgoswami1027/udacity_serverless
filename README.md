@@ -98,6 +98,26 @@ NOTE. If a table has a composite key, there can be multiple items with the same 
 ![](images/partition_sort_key.png)
 ![](images/partition_sort_key_explain.png)
 
+### 4. Enable XRAY Tracing - Lambda functions [Done]
+    * https://www.youtube.com/watch?v=Qj1w2Qbt99o&feature=youtu.be&t=168
+### 5. Print your serverless.yml with variables resolved
+``` $ serverless print
+This prints the provider name:
+$ sls print --path provider
+e.g.
+$ sls print --path resources
+And this prints all function names:
+$ sls print --path functions --transform keys --format text
+$ sls print --path functions
+
+s
+^Cbackend $ sls print --path functions 
+```
+
+
+
+
+
 --------------------------------------------------------------------------------------------------------------------------------------
 
 # Serverless TODO (Project Assignment Steps)
