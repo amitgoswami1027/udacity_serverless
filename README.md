@@ -2,9 +2,8 @@
 
 ------------------------------------------------------------------------------------------------------------------------------------
 ## CODE REVIEW COMMENTS IMPLEMENTATION (Serverless Project Review)
-### 1. [Code of Lambda functions is split into multiple files/classes. The business logic of an application is separated from code for database access, file storage, and code related to AWS Lambda.] The business logic of an application should be separated from code for
-database access, file storage and code related to AWS Lambda.To separate code for database access and file storage, kindly create two folders: src/businessLogic and src/dataLayer. [Done]
-### 2. [Incoming HTTP requests are validated either in Lambda handlers or using request validation in API Gateway. The latter can be done either using the serverless-reqvalidator-plugin or by providing request schemas in function definitions.]  Request validation is required for this project:using the serverless-reqvalidator-plugin or by providing request schemas in function definitions.
+### 1. [Code of Lambda functions is split into multiple files/classes. The business logic of an application is separated from code for database access, file storage, and code related to AWS Lambda.] The business logic of an application should be separated from code fordatabase access, file storage and code related to AWS Lambda.To separate code for database access and file storage, kindly create two folders: src/businessLogic and src/dataLayer. [Done]
+### 2. [Incoming HTTP requests are validated either in Lambda handlers or using request validation in API Gateway. The latter can be done either using the serverless-reqvalidator-plugin or by providing request schemas in function definitions.]  Request validation is required for this project:using the serverless-reqvalidator-plugin or by providing request schemas in function definitions. [Done]
 Ensure we cannot create invalid objects. These are the two options:
  * Use serverless-reqvalidator-plugin serverless framework plugin.
  * Use request schema (request.schema:), .json definitions, in serverless.yml file under the functions, e.g. CreateTodo:, UpdateTodo:,  
@@ -56,7 +55,7 @@ Ensure we cannot create invalid objects. These are the two options:
  ![](images/reqvalidator.png)
  ![](images/jsonval.png)
 
-### 3. [Architecture] : 1:M (1 to many) relationship between users and TODO items is modeled using a DynamoDB table that has a composite key with both partition and sort keys. Should be defined similar to this:
+### 3. [Architecture] : 1:M (1 to many) relationship between users and TODO items is modeled using a DynamoDB table that has a composite key with both partition and sort keys. Should be defined similar to this: [Done]
 * Review Comments: You have chosen todoId for your primary key and not chosen a sort key (RANGE). Unfortunately, this is a project requirement: 1:M (1 to many) relationship between users (userId) and TODO items (todoId). Each user (userId) can have many items assigned to it (name, attached-images, due-date, ...). You should use HASH and RANGE keys for DynamoDB Table.
 #### [Learnings] : 
 #### Composite key: A composite key in DynamoDB consists of two elements
