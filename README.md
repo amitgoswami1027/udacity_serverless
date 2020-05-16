@@ -1,4 +1,125 @@
 # Udacity ServerlessProject
+
+------------------------------------------------------------------------------------------------------------------------------------
+## CODE REVIEW COMMENTS IMPLEMENTATION (Serverless Project Review)
+### 1. [Code of Lambda functions is split into multiple files/classes. The business logic of an application is separated from code for database access, file storage, and code related to AWS Lambda.] The business logic of an application should be separated from code fordatabase access, file storage and code related to AWS Lambda.To separate code for database access and file storage, kindly create two folders: src/businessLogic and src/dataLayer. [Done]
+### 2. [Incoming HTTP requests are validated either in Lambda handlers or using request validation in API Gateway. The latter can be done either using the serverless-reqvalidator-plugin or by providing request schemas in function definitions.]  Request validation is required for this project:using the serverless-reqvalidator-plugin or by providing request schemas in function definitions. [Done]
+Ensure we cannot create invalid objects. These are the two options:
+ * Use serverless-reqvalidator-plugin serverless framework plugin.
+ * Use request schema (request.schema:), .json definitions, in serverless.yml file under the functions, e.g. CreateTodo:, UpdateTodo:,  
+   in functions: section. For more information enabling request schema validation (.json definitions) kindly have a look at:
+ * Links for Reference-1 : https://www.youtube.com/watch?v=mxOgm8ldJKU&feature=youtu.be
+ * Links for Reference-2 : https://www.serverless.com/framework/docs/providers/aws/events/apigateway/#request-schema-validators
+ * Links for Reference-3 : https://json-schema.org/
+ ### STEPS: (Done)
+ * Step-01 Commands: * npm install serverless-aws-documentation serverless-reqvalidator-plugin --save-dev
+ * Step-02 : Add - serverless-reqvalidator-plugin and - serverless-aws-documentation the plug-in section of serverless.yml file.
+ * Step-03 : Create "Custom" section in serverless.yml file and provide the provide the JSON request models.
+ * Step-04 : Create following under the "Resources" section of the serverless.yml file.
+ ```Resources:    
+      RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+ ```
+ * Step-05 : Specify which function should be validated by the above validator
+ ```CreateTodo:
+    handler: src/lambda/http/createTodo.handler
+    events:
+      - http:
+          method: post
+          path: todos
+          cors: 
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            authorizer: Auth
+            #allowCredentials: false
+            reqValidatorName: RequestBodyValidator
+            documentation:
+              summary: Create a new Todo Items
+              description: Create a new Todo Items
+              requestModels:
+                'application/json': CreateTodoRequest
+ ```
+ * Step-06 : serverless deploy -v [Done]
+ ![](images/reqvalidator.png)
+ ![](images/jsonval.png)
+
+### 3. [Architecture] : 1:M (1 to many) relationship between users and TODO items is modeled using a DynamoDB table that has a composite key with both partition and sort keys. Should be defined similar to this: [Done]
+* Review Comments: You have chosen todoId for your primary key and not chosen a sort key (RANGE). Unfortunately, this is a project requirement: 1:M (1 to many) relationship between users (userId) and TODO items (todoId). Each user (userId) can have many items assigned to it (name, attached-images, due-date, ...). You should use HASH and RANGE keys for DynamoDB Table.
+#### [Learnings] : 
+#### Composite key: A composite key in DynamoDB consists of two elements
+     * Partition key - what partition to write item to
+     * Sort key - to sort elements with the same partition key
+     * Together - uniquely identify an item, meaning there can be no two items in a table with the same values of composite key.
+
+NOTE. If a table has a composite key, there can be multiple items with the same partition key, providing they have different values of sort key.Composite keys allows to perform queries, that can be used to get a subset of items with a specified partition key.
+
+#### [Implementation]: It's big mistake to use for partition key todoId and userId for sort key. Doing that the DynamoDb can store item physically on different machines and in different partitions. That leads to very expensive read operations when, for instance, you need to collect all items for one userId.Best idea here to achieve all project requirement is to set partition key as userId to store records in one place and to set todoId as sort key.
+
+ * details: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.Partitions.html
+ * https://aws.amazon.com/blogs/database/choosing-the-right-dynamodb-partition-key/
+
+```TodosDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId  //Partition Key
+            AttributeType: S
+          - AttributeName: todoId  // Sort Key
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: todoId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.TODOS_INDEX_NAME}
+            KeySchema:
+            - AttributeName: userId  // Index Key
+              KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+        TableName: ${self:provider.environment.TODOS_TABLE}
+```
+![](images/partition_sort_key.png)
+![](images/partition_sort_key_explain.png)
+
+### 4. Enable XRAY Tracing - Lambda functions [Done]
+    * https://www.youtube.com/watch?v=Qj1w2Qbt99o&feature=youtu.be&t=168
+### 5. Print your serverless.yml with variables resolved
+``` $ serverless print
+This prints the provider name:
+$ sls print --path provider
+e.g.
+$ sls print --path resources
+And this prints all function names:
+$ sls print --path functions --transform keys --format text
+$ sls print --path functions
+
+s
+^Cbackend $ sls print --path functions 
+```
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
 # Serverless TODO (Project Assignment Steps)
 To implement this project, you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all comments starting with the `TODO:` in the code to find the placeholders that you need to implement.
 
@@ -239,7 +360,6 @@ Right click on the imported collection to set variables for the collection:
 
 Provide variables for the collection (similarly to how this was done in the course):
 ![Alt text](images/import-collection-5.png?raw=true "Image 5")
-
 --------------------------------------------------------------------------------------------------------------------------------------
 # Udacity Serverless Technology - Learnings
 # Serverless Technologies
@@ -370,7 +490,7 @@ Presigned URL is a special URL pointing to an S3 bucket that can be used by anyo
 ![](images/presignedurl.png)
 
 Here is a code snippet that can be used to generate a presigned URL:
-!! const s3 = new AWS.S3({
+``` const s3 = new AWS.S3({
    signatureVersion: 'v4' // Use Sigv4 algorithm
  })
  const presignedUrl = s3.getSignedUrl('putObject', { // The URL will allow to perform the PUT operation
@@ -378,11 +498,11 @@ Here is a code snippet that can be used to generate a presigned URL:
    Key: 'object-id', // id of an object this URL allows access to
    Expires: '300'  // A URL is only valid for 5 minutes
  })
- 
+ ```
 #### https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
  
 ## S3 Events : Here is a configuration snippet that can be used to subscribe to S3 events
-functions:
+```functions:
   process:
     handler: file.handler
     events:
@@ -391,7 +511,7 @@ functions:
         rules:
             - prefix: images/
             - suffix: .png
-
+```
 ### WEBSOCKETS
 WebSocket allows to implement bi-directional communication between a web application and a server. It can be especially useful for applications like:
 * Messaging Applications
@@ -418,18 +538,18 @@ WebSocket API provides two URLs: WebSocket URL and Connection URL.
 * DELETE: to disconnect a client from API
 
 Here is an example of how to react to WebSocket events using Serverless Framework:
-!! ConnectHandler:
+``` ConnectHandler:
     handler: src/websocket/connect.handler
     events:
       - websocket:
           route: $connect
 
- !! DisconnectHandler:
+  DisconnectHandler:
     handler: src/websocket/disconnect.handler
     events:
       - websocket:
           route: $disconnect
-
+```
 #### Testing Websocket APIs
 PostMan doesnot supprot Websocket connections, so we can use the third party tool wscat -Websocket client CLI. 
 * INSTALL : npm install wscat -g
@@ -463,7 +583,7 @@ A custom authorizer is a Lambda function that is executed before processing a re
 ![](images/custom_auth.png)
 
 Here is an example of a custom authorizer:
-!!exports.handler = async (event) => {
+```exports.handler = async (event) => {
    // Contains a token
    const token = event.authorizationToken
    // Check a token here
@@ -481,7 +601,7 @@ Here is an example of a custom authorizer:
      }
    }
  }
-
+```
 ### OAUTH2.0 PROTOCOL
 * OAuto 2.0 : Authorization for third party app to get resources (eg. google contacts)
 * OpenID : Authentication on the top of OAuth.
@@ -520,7 +640,7 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
    * Third party applications/tools like HashiCorp Vault.
 
 ### Bucket CORS Policy
-!! <?xml version="1.0" encoding="UTF-8"?>
+``` <?xml version="1.0" encoding="UTF-8"?>
 <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
 <CORSRule>
     <AllowedOrigin>*</AllowedOrigin>
@@ -532,6 +652,7 @@ OAuth allows to use one of the two algorithms that it can use to sign a JWT toke
     <AllowedHeader>*</AllowedHeader>
 </CORSRule>
 </CORSConfiguration>
+```
 --------------------------------------------------------------------------------------------------------------------------------------
 ### Udacity Problem Solving :
 https://knowledge.udacity.com/questions/167880
@@ -539,4 +660,6 @@ https://knowledge.udacity.com/questions/167880
 # Interesting Links to Read
 ## Cloud Vendor Lock-in : https://martinfowler.com/articles/oss-lockin.html
 ## JWT Must Read : https://redthunder.blog/2017/06/08/jwts-jwks-kids-x5ts-oh-my/
+## Serverless Framework: Defining Per-Function IAM Roles : https://medium.com/@glicht/serverless-framework-defining-per-function-iam-roles-c678fa09f46d
+## REQUEST Validators: https://www.serverless.com/framework/docs/providers/aws/events/apigateway/#request-schema-validators
 
