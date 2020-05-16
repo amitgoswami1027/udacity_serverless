@@ -12,10 +12,10 @@ Ensure we cannot create invalid objects. These are the two options:
 * Links for Reference-2 : https://www.serverless.com/framework/docs/providers/aws/events/apigateway/#request-schema-validators
 * Links for Reference-3 : https://json-schema.org/
 ### STEPS: (Done)
-#### Step-01 Commands: * npm install serverless-aws-documentation serverless-reqvalidator-plugin --save-dev
-#### Step-02 : Add - serverless-reqvalidator-plugin and - serverless-aws-documentation the plug-in section of serverless.yml file.
-#### Step-03 : Create "Custom" section in serverless.yml file and provide the provide the JSON request models.
-#### Step-04 : Create following under the "Resources" section of the serverless.yml file.
+* Step-01 Commands: * npm install serverless-aws-documentation serverless-reqvalidator-plugin --save-dev
+* Step-02 : Add - serverless-reqvalidator-plugin and - serverless-aws-documentation the plug-in section of serverless.yml file.
+* Step-03 : Create "Custom" section in serverless.yml file and provide the provide the JSON request models.
+* Step-04 : Create following under the "Resources" section of the serverless.yml file.
 ```Resources:    
       RequestBodyValidator:
       Type: AWS::ApiGateway::RequestValidator
